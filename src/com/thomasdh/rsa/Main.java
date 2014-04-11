@@ -4,9 +4,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * Created by Thomas on 11-4-14.
- */
 public class Main {
 
     static final int maxASCIIValue = 128;
@@ -79,7 +76,6 @@ public class Main {
         //This doesn't work for large values...
         int count = (int) Math.ceil(Math.log(integer.longValue()) / Math.log(maxASCIIValue));
 
-        char[] chars = new char[count];
         String s = "";
         for (int x = 0; x < count; x++) {
             s += (char) integer.mod(
@@ -157,7 +153,7 @@ public class Main {
         }
         BigInteger answer = table2.get(table2.size() - 1)[2].mod(z);
         if (answer.signum() == 1)
-            answer.add(z);
+            answer = answer.add(z);
         return answer;
     }
 
@@ -169,7 +165,7 @@ public class Main {
             if (currentNum.compareTo(BigInteger.ONE) > 0 && currentNum.compareTo(z) < 0) {
                 e = waving(guess, count);
             }
-            count.add(BigInteger.ONE);
+            count = count.add(BigInteger.ONE);
         } while (gcd(z, e).compareTo(BigInteger.ONE) != 0);
         return e;
     }
