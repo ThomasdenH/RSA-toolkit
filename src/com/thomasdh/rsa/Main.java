@@ -78,10 +78,10 @@ public class Main {
         table1.get(0)[0] = z;
         table1.get(0)[1] = e;
 
-        while (table1.get(table1.size() - 1)[1] != BigInteger.valueOf(0)) {
+        while (table1.get(table1.size() - 1)[1].compareTo(BigInteger.ZERO) != 0) {
             int count = table1.size() - 1;
             table1.get(count)[2] = table1.get(count)[0].divide(table1.get(count)[1]);
-            table1.get(count)[3] = table1.get(count)[0].divide(table1.get(count)[1]);
+            table1.get(count)[3] = table1.get(count)[0].mod(table1.get(count)[1]);
 
             table1.add(new BigInteger[4]);
             table1.get(count + 1)[0] = table1.get(count)[1];
