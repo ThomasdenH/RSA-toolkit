@@ -9,6 +9,8 @@ import java.util.Scanner;
  */
 public class Main {
 
+    static final int maxASCIIValue = 128;
+
     public static void main(String[] args) {
 
         while (true) {
@@ -17,6 +19,7 @@ public class Main {
             System.out.println("Welcome to the RSA toolkit by Thomas den Hollander");
             System.out.println("(1) to generate new RSA keys");
             System.out.println("(2) to encrypt/ decrypt something");
+            System.out.println("(3) to convert a number to a string and vice versa");
             System.out.println("(0) to quit");
 
             String inputString = input.nextLine();
@@ -26,15 +29,66 @@ public class Main {
             } else if (inputString.equals("0")) {
                 System.exit(0);
             } else if (inputString.equals("2")) {
-                System.out.println("Please specify the input:");
-                BigInteger number = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+                System.out.println("Do you want to input a number (1) or a string (2)?");
+                BigInteger number;
+                if (input.nextLine().equals("1")) {
+                    System.out.println("Please specify the input:");
+                    number = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+                }else{
+                    System.out.println("Please specify the input:");
+                    number = convertStringToBigInteger(input.nextLine());
+                }
                 System.out.println("Please specify the exponent:");
                 BigInteger exponent = BigInteger.valueOf(Long.parseLong(input.nextLine()));
                 System.out.println("Please specify the modulus:");
                 BigInteger modulus = BigInteger.valueOf(Long.parseLong(input.nextLine()));
-                System.out.println("The answer is " + number.modPow(exponent, modulus).toString());
+                if (number.compareTo(modulus) > 0) {
+                    System.out.println("This number is bigger than the modulus allows");
+                } else {
+                    BigInteger answer = number.modPow(exponent, modulus);
+                    System.out.println("The answer is " +  answer.toString() + " or as a string " + convertBigIntegerToString(answer));
+                }
+            } else if (inputString.equals("3")) {
+                System.out.println("(1) to convert a number to a string");
+                System.out.println("(2) to convert a string to a number");
+                if (input.nextLine().equals("1")) {
+                    System.out.println(convertBigIntegerToString(BigInteger.valueOf(Long.parseLong(input.nextLine()))));
+                } else {
+                    System.out.println(convertStringToBigInteger(input.nextLine()));
+                }
             }
         }
+    }
+
+    static BigInteger convertStringToBigInteger(String string) {
+        char[] chars = string.toCharArray();
+        BigInteger totalNumber = BigInteger.ZERO;
+        for (int x = 0; x < chars.length; x++) {
+            if ((int) chars[x] > maxASCIIValue) {
+                System.out.println("This character is not contained in the first " + maxASCIIValue + " characters");
+            }
+            totalNumber = totalNumber.add(
+                    BigInteger.valueOf((int) chars[x]).multiply(
+                            BigInteger.valueOf(maxASCIIValue).pow(x)
+                    ));
+        }
+        return totalNumber;
+    }
+
+    static String convertBigIntegerToString(BigInteger integer) {
+        //This doesn't work for large values...
+        int count = (int) Math.ceil(Math.log(integer.longValue()) / Math.log(maxASCIIValue));
+
+        char[] chars = new char[count];
+        String s = "";
+        for (int x = 0; x < count; x++) {
+            s += (char) integer.mod(
+                    BigInteger.valueOf(maxASCIIValue).pow(x + 1)
+            ).divide(
+                    BigInteger.valueOf(maxASCIIValue).pow(x)
+            ).intValue();
+        }
+        return s;
     }
 
     static void generateRSAKeys() {
