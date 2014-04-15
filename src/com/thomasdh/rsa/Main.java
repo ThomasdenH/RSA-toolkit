@@ -6,7 +6,15 @@ import java.util.Scanner;
 
 public class Main {
 
+    static final int ENCRYPTION_TYPE_ASCII = 100;
     static final int maxASCIIValue = 128;
+
+    static final int ENCRYPTION_TYPE_BASIC_ALPHABET = 101;
+    static final char[] basicAlphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+    static final int ENCRYPTION_TYPE_EXTENDED_ALPHABET = 102;
+    static final char[] extendedAlphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y','Z', ',', ' ', '.', '\"','\"', ':', ';', '(', ')'};
 
     public static void main(String[] args) {
 
@@ -26,63 +34,131 @@ public class Main {
             } else if (inputString.equals("0")) {
                 System.exit(0);
             } else if (inputString.equals("2")) {
-                System.out.println("Do you want to input a number (1) or a string (2)?");
-                BigInteger number;
-                if (input.nextLine().equals("1")) {
-                    System.out.println("Please specify the input:");
-                    number = BigInteger.valueOf(Long.parseLong(input.nextLine()));
-                }else{
-                    System.out.println("Please specify the input:");
-                    number = convertStringToBigInteger(input.nextLine());
-                }
+                System.out.println("Please specify the number:");
+                BigInteger number = new BigInteger(input.nextLine());
                 System.out.println("Please specify the exponent:");
-                BigInteger exponent = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+                BigInteger exponent = new BigInteger(input.nextLine());
                 System.out.println("Please specify the modulus:");
-                BigInteger modulus = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+                BigInteger modulus = new BigInteger(input.nextLine());
                 if (number.compareTo(modulus) > 0) {
                     System.out.println("This number is bigger than the modulus allows");
                 } else {
                     BigInteger answer = number.modPow(exponent, modulus);
-                    System.out.println("The answer is " +  answer.toString() + " or as a string " + convertBigIntegerToString(answer));
+                    System.out.println("The answer is " + answer.toString());
                 }
             } else if (inputString.equals("3")) {
                 System.out.println("(1) to convert a number to a string");
                 System.out.println("(2) to convert a string to a number");
-                if (input.nextLine().equals("1")) {
-                    System.out.println(convertBigIntegerToString(BigInteger.valueOf(Long.parseLong(input.nextLine()))));
+
+                boolean numberToString = input.nextLine().equals("1");
+                int translateType = 100;
+
+                System.out.println();
+                System.out.println("(1) to use ASCII conversiion");
+                System.out.println("(2) to use a simple alphabet (a-z)");
+                System.out.println("(3) to use an extended alphabet (a-z, A-Z, .'\":;()");
+                System.out.println("(4) to use fake words");
+
+                int inputInt = Integer.parseInt(input.nextLine());
+                if (inputInt == 1) {
+                    translateType = ENCRYPTION_TYPE_ASCII;
+                } else if (inputInt == 2) {
+                    translateType = ENCRYPTION_TYPE_BASIC_ALPHABET;
+                } else if (inputInt == 3){
+                    translateType = ENCRYPTION_TYPE_EXTENDED_ALPHABET;
+                }
+
+                if (numberToString) {
+                    System.out.println(convertBigIntegerToString(new BigInteger(input.nextLine()), translateType));
                 } else {
-                    System.out.println(convertStringToBigInteger(input.nextLine()));
+                    System.out.println(convertStringToBigInteger(input.nextLine(), translateType));
                 }
             }
         }
     }
 
-    static BigInteger convertStringToBigInteger(String string) {
+    static BigInteger convertStringToBigInteger(String string, int type) {
         char[] chars = string.toCharArray();
         BigInteger totalNumber = BigInteger.ZERO;
+
+        BigInteger maxValue = null;
+        if (type == ENCRYPTION_TYPE_ASCII)
+            maxValue = BigInteger.valueOf(maxASCIIValue);
+        if (type == ENCRYPTION_TYPE_BASIC_ALPHABET)
+            maxValue = BigInteger.valueOf(basicAlphabet.length);
+        if (type == ENCRYPTION_TYPE_EXTENDED_ALPHABET)
+            maxValue = BigInteger.valueOf(extendedAlphabet.length);
+
         for (int x = 0; x < chars.length; x++) {
-            if ((int) chars[x] > maxASCIIValue) {
-                System.out.println("This character is not contained in the first " + maxASCIIValue + " characters");
-            }
+
             totalNumber = totalNumber.add(
-                    BigInteger.valueOf((int) chars[x]).multiply(
-                            BigInteger.valueOf(maxASCIIValue).pow(x)
+                    BigInteger.valueOf(
+                            convertCharToIntValue(chars[x], type)
+                    ).multiply(maxValue
+                            .pow(x)
                     ));
         }
         return totalNumber;
     }
 
-    static String convertBigIntegerToString(BigInteger integer) {
-        //This doesn't work for large values...
-        int count = (int) Math.ceil(Math.log(integer.longValue()) / Math.log(maxASCIIValue));
+    static int convertCharToIntValue(char c, int type) {
+        if (type == ENCRYPTION_TYPE_ASCII) {
+            if ((int) c > maxASCIIValue) {
+                System.out.println("This character is not contained in the first " + maxASCIIValue + " characters");
+            }
+            return (int) c;
+        }
+        if (type == ENCRYPTION_TYPE_BASIC_ALPHABET) {
+            for (int x = 0; x < basicAlphabet.length; x++) {
+                if (basicAlphabet[x] == c) {
+                    return x;
+                }
+            }
+        }
+        if (type == ENCRYPTION_TYPE_EXTENDED_ALPHABET) {
+            for (int x = 0; x < extendedAlphabet.length; x++) {
+                if (extendedAlphabet[x] == c) {
+                    return x;
+                }
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    static char convertIntToCharValue(int c, int type) {
+        if (type == ENCRYPTION_TYPE_ASCII) {
+            if (c > maxASCIIValue) {
+                System.out.println("This character is not contained in the first " + maxASCIIValue + " characters");
+            }
+            return (char) c;
+        }
+        if (type == ENCRYPTION_TYPE_BASIC_ALPHABET) {
+            return basicAlphabet[c];
+        }
+        if (type == ENCRYPTION_TYPE_EXTENDED_ALPHABET) {
+            return extendedAlphabet[c];
+        }
+        throw new IllegalArgumentException();
+    }
+
+    static String convertBigIntegerToString(BigInteger integer, int type) {
+        int maxValue = 0;
+        if (type == ENCRYPTION_TYPE_ASCII)
+            maxValue = maxASCIIValue;
+        if (type == ENCRYPTION_TYPE_BASIC_ALPHABET)
+            maxValue = basicAlphabet.length;
+        if (type == ENCRYPTION_TYPE_EXTENDED_ALPHABET)
+            maxValue = extendedAlphabet.length;
+
+        int count = (int) Math.ceil(integer.bitLength() * Math.log(2) / Math.log(maxValue));
 
         String s = "";
         for (int x = 0; x < count; x++) {
-            s += (char) integer.mod(
-                    BigInteger.valueOf(maxASCIIValue).pow(x + 1)
+            s += convertIntToCharValue(integer.mod(
+                    BigInteger.valueOf(maxValue).pow(x + 1)
             ).divide(
-                    BigInteger.valueOf(maxASCIIValue).pow(x)
-            ).intValue();
+                    BigInteger.valueOf(maxValue).pow(x)
+            ).intValue(), type);
         }
         return s;
     }
@@ -100,7 +176,7 @@ public class Main {
 
         z = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
         m = p.multiply(q);
-        System.out.println("The modulus is " + m);
+        System.out.println("The modulus is " + m + ". This is also the max value.");
 
         System.out.println("Please enter a guess for the public exponent: (The program wil calculate the closest solution)");
         BigInteger guess = BigInteger.valueOf(Long.parseLong(input.nextLine()));
