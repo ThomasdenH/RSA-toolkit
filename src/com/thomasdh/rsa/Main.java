@@ -169,17 +169,17 @@ public class Main {
         Scanner input = new Scanner(System.in);
 
         System.out.println("Please enter the first prime number:");
-        p = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+        p = new BigInteger(input.nextLine());
 
         System.out.println("Please enter the second prime number:");
-        q = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+        q = new BigInteger(input.nextLine());
 
         z = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
         m = p.multiply(q);
         System.out.println("The modulus is " + m + ". This is also the max value.");
 
         System.out.println("Please enter a guess for the public exponent: (The program wil calculate the closest solution)");
-        BigInteger guess = BigInteger.valueOf(Long.parseLong(input.nextLine()));
+        BigInteger guess = new BigInteger(input.nextLine());
 
         e = getPublicExponent(guess, z);
 
