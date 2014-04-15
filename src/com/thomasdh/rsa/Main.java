@@ -2,6 +2,7 @@ package com.thomasdh.rsa;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -57,7 +58,6 @@ public class Main {
                 System.out.println("(1) to use ASCII conversiion");
                 System.out.println("(2) to use a simple alphabet (a-z)");
                 System.out.println("(3) to use an extended alphabet (a-z, A-Z, .'\":;()");
-                System.out.println("(4) to use fake words");
 
                 int inputInt = Integer.parseInt(input.nextLine());
                 if (inputInt == 1) {
@@ -188,7 +188,7 @@ public class Main {
 
         d = calculatePrivateExponent(z, e);
 
-        System.out.println("The private exponent is " + d);
+        System.out.println("The private exponent is " + d + " and has a bit length of " + d.bitLength());
 
         System.out.println();
         System.out.println("Encrypting: x ^ " + e + " mod " + m);
